@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OTP Viewer</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 2rem; }
+    .otp { font-size: 3rem; font-weight: 700; letter-spacing: .2em; }
+    .muted { color: #777; }
+  </style>
+</head>
+<body>
+  <h1>OTP ล่าสุด</h1>
+  <div class="otp" id="otp">—</div>
+  <p class="muted" id="time"></p>
+
+  <script>
+    async function loadOTP() {
+      try {
+        const res = await fetch('./otp.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        document.getElementById('otp').textContent = data.otp ?? '—';
+        document.getElementById('time').textContent = data.updatedAt
+          ? `อัปเดตเมื่อ: ${new Date(data.updatedAt).toLocaleString()}`
+          : '';
+      } catch (e) {
+        document.getElementById('otp').textContent = 'โหลดไม่ได้';
+        console.error(e);
+      }
+    }
+    loadOTP();
+    // รีเฟรชทุก 10 วินาที
+    setInterval(loadOTP, 10000);
+  </script>
+</body>
+</html>
